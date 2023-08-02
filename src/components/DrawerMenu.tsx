@@ -13,7 +13,7 @@ function DrawerMenu(props: {
   censusOptions: options; 
   handleCheckboxChange: ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void) | undefined; update: () => void; 
 }) {
-  
+
   const [state, setState] = React.useState({
     left: false
   });
@@ -45,8 +45,8 @@ function DrawerMenu(props: {
         handleCheckboxChange={props.handleCheckboxChange}
         update={(e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
             e.preventDefault();
-            props.update();
             toggleDrawer('left', false);
+            props.update();
           }
         }
       />

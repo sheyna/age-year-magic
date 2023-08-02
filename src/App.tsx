@@ -17,6 +17,7 @@ import ageObj from './typeAgeObj';
 import Button from '@mui/material/Button';
 import DrawerMenu from './components/DrawerMenu';
 import ResultsTable from './components/ResultsTable';
+import Alert from '@mui/material/Alert';
 
 // modules
 import makeCensusList from './census';
@@ -32,6 +33,12 @@ type resultsType = {
   dateWritten: string
 }
 
+type errorDataType = {
+  errorType: string,
+  errorMsg: string,
+  isAnError: boolean
+}
+
 function makeAgeInstance(age: Dayjs, censusDate: census) {
   return {
     age: age,
@@ -45,10 +52,8 @@ function getAges(birthDate: Dayjs, censusData: Array<census> | null) {
   const agesArr: Dayjs[] = [];
   (censusData && censusData.length > 0) && censusData.forEach((cen: census) => {
     // calcuate age
-    console.log(cen);
     if (cen.censusObj.year() >= birthDate.year()) {
       const age = cen.censusObj.diff(birthDate, 'year');
-      console.log(age);
       agesArr.push(makeAgeInstance(age, cen));
     }
   });
@@ -75,29 +80,42 @@ function App() {
     btnVariant: 'contained',
     dateWritten: ''
   });
-  
 
+  const [error, setError] = useState<errorDataType>({
+    errorType: 'warning',
+    errorMsg: '',
+    isAnError: false
+  });
+  
   const handleCheckboxChange =(newCensusOptions: options) => {
     setCensusOptions(newCensusOptions);
     console.log(censusOptions);
   };
 
   const handleUpdateCensusListResults =() => {
-    const censusList: Array<census> = makeCensusList(censusOptions) || [];
-    const ages: Array<ageObj> = birthDate && getAges(birthDate, censusList);
-    const dateWritten: string | null = birthDate && birthDate.format('D MMM YYYY');
-    setResultsView({
-      display: true,
-      btnText: 'Update Age',
-      btnVariant: 'text',
-      results: ages,
-      dateWritten: dateWritten || ''
-    });
+    console.log(censusOptions);
+    if (!birthDate) {
+      setError({
+        errorType: 'warning',
+        errorMsg: 'Please enter birth date first',
+        isAnError: false
+      }); 
+    } else {
+      const censusList: Array<census> = makeCensusList(censusOptions) || [];
+      const ages: Array<ageObj> = birthDate && getAges(birthDate, censusList);
+      const dateWritten: string | null = birthDate && birthDate.format('D MMM YYYY');
+      setResultsView({
+        display: true,
+        btnText: 'Update Age',
+        btnVariant: 'text',
+        results: ages,
+        dateWritten: dateWritten || ''
+      });
+    }
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {console.log(censusOptions)}
       <header>
         <h1>Age Year Magic</h1>
         <h2>Age calculator</h2>
@@ -111,6 +129,9 @@ function App() {
         />
       </header>
       <main>
+        {error.isAnError && 
+          <Alert severity={error.errorType}>{error.errorMsg}</Alert>
+        }
         <form id="ageEntry">
           <DatePicker
             name='birthDate'
@@ -123,7 +144,6 @@ function App() {
             views={['day', 'month', 'year']}
             onYearChange={() => displayBtn = true}
             onChange={(newValue: Dayjs) => {
-              console.log(newValue);
               // TODO make this better:
               if (
                 newValue

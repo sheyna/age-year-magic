@@ -8,7 +8,7 @@ This tool is an aid to genealogists trying to determine the approximate age of a
 
 It is well known that ages reported in census reports are approximate and birth dates weren't commonly reported until fairly recently. One reason that data from past census can be fuzzy is because if you weren't home when the census ennumorator came to your house, the ennumorator could ask your neighbors for the information about you (ex. "We think she's about 30 years old"). Genealogist today have to take in all available data to approximate the most likely birth date for an ancestor. This tool takes some off the work load when it comes to calcuating ages on the various census dates.
 
-## HOW
+## How
 
 The tech stack used to create this app
 
@@ -20,7 +20,7 @@ The tech stack used to create this app
 
 ## Features
 
-* enter a date
+* enter a birth date, see ages calcuated from that birth date
 * Pick which census records you want calculated in a result based on what census records would be available for the ancestor you are looking at.
 
 At the moment this app only has 2 census options:
