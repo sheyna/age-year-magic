@@ -11,12 +11,12 @@ import Button from '@mui/material/Button';
 // type:
 import options from '../typeOptions';
 
-function CensusMenu(props: {
-    update: React.FormEventHandler<HTMLFormElement> | undefined; censusOptions: options; 
-    handleCheckboxChange: ((event: React.ChangeEvent<
-      HTMLInputElement>, checked: boolean) => void) | undefined; 
-      cancel: React.MouseEventHandler<HTMLButtonElement> | undefined;
-  }) {
+function CensusMenu(props: { 
+  censusOptions: options; 
+  handleCheckboxChange: (arg0: options) => void; 
+  update: React.FormEventHandler<HTMLFormElement> | undefined; 
+  cancel: React.MouseEventHandler<HTMLButtonElement> | undefined; 
+}) {
 
   const [censusOptions, setCensusOptions] = useState<options>({
     showUSCensuses: props.censusOptions.showUSCensuses,
@@ -24,7 +24,7 @@ function CensusMenu(props: {
     showKansasCensus: props.censusOptions.showKansasCensus
   });
 
-  const handleChange = function (event: React.ChangeEvent<HTMLInputElement>) {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCensusOptions({
       ...censusOptions,
       [event.target.name]: event.target.checked,

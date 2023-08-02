@@ -2,23 +2,18 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
-// import FormLabel from '@mui/material/FormLabel';
-// import FormControl from '@mui/material/FormControl';
-// import FormGroup from '@mui/material/FormGroup';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import FormHelperText from '@mui/material/FormHelperText';
-// import Checkbox from '@mui/material/Checkbox';
-// import dayjs from 'dayjs';
 import CensusMenu from './CensusMenu';
-
-// type
-import options from '../typeOptions';
 
 // css
 import './DrawerMenu.css';
 
+import options from '../typeOptions';
 
-function DrawerMenu(props: { censusOptions: { showUSCensuses: boolean | undefined; show1890Census: boolean | undefined; showKansasCensus: boolean | undefined; }; handleCheckboxChange: ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void) | undefined; update: (arg0: options) => void; }) {
+function DrawerMenu(props: { 
+  censusOptions: options; 
+  handleCheckboxChange: ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void) | undefined; update: () => void; 
+}) {
+  
   const [state, setState] = React.useState({
     left: false
   });
@@ -42,8 +37,6 @@ function DrawerMenu(props: { censusOptions: { showUSCensuses: boolean | undefine
       sx={{width: 400}}
       role="presentation"
       className="drawer-box"
-      // onClick={toggleDrawer('left', false)}
-      // onKeyDown={toggleDrawer('left', false)}
     >
 
       <CensusMenu
