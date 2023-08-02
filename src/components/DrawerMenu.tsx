@@ -11,9 +11,14 @@ import Button from '@mui/material/Button';
 // import dayjs from 'dayjs';
 import CensusMenu from './CensusMenu';
 
+// type
+import options from '../typeOptions';
+
+// css
+import './DrawerMenu.css';
 
 
-function DrawerMenu() {
+function DrawerMenu(props: { censusOptions: { showUSCensuses: boolean | undefined; show1890Census: boolean | undefined; showKansasCensus: boolean | undefined; }; handleCheckboxChange: ((event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => void) | undefined; update: (arg0: options) => void; }) {
   const [state, setState] = React.useState({
     left: false
   });
@@ -34,14 +39,25 @@ function DrawerMenu() {
 
   const list = () => (
     <Box
-      sx={{width: 250}}
+      sx={{width: 400}}
       role="presentation"
+      className="drawer-box"
       // onClick={toggleDrawer('left', false)}
       // onKeyDown={toggleDrawer('left', false)}
     >
 
-    <CensusMenu/>
-    <Button onClick={toggleDrawer('left', true)}>Update</Button>
+      <CensusMenu
+        cancel={toggleDrawer('left', false)}
+        censusOptions={props.censusOptions}
+        handleCheckboxChange={props.handleCheckboxChange}
+        update={(e: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
+            e.preventDefault();
+            props.update();
+            toggleDrawer('left', false);
+          }
+        }
+      />
+
       
     </Box>
   );

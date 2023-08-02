@@ -1,43 +1,36 @@
 import { useState } from 'react'
+
+// Date handling
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import type {} from '@mui/x-date-pickers/themeAugmentation';
+import type { } from '@mui/x-date-pickers/themeAugmentation';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import './App.css'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+// types
+import census from './typeCensus';
+import options from './typeOptions';
+import ageObj from './typeAgeObj';
+
+// other components
 import Button from '@mui/material/Button';
 import DrawerMenu from './components/DrawerMenu';
 import ResultsTable from './components/ResultsTable';
+
+// modules
 import makeCensusList from './census';
 
+// css
+import './App.css'
 
-type census = {
-  censusObj: Dayjs,
-  censusName: string
+type resultsType = {
+  display: boolean,
+  btnText: string,
+  btnVariant: string,
+  results: Array<ageObj>,
+  dateWritten: string
 }
-
-type options = {
-  showUSCensuses: boolean,
-  show1890Census: boolean,
-  showKansasCensus: boolean
-}
-
-type ageObj = {
-  age: number;
-  censusName: string;
-  censusDate: Dayjs;
-  dateWritten: string;
-}
-
-// class AgeInstance {
-//   constructor(age: Dayjs, censusDate: census) {
-//     this.age = age;
-//     this.censusName = censusDate.censusName;
-//     this.censusDate = censusDate.censusObj;
-//     this.dateWritten = censusDate.censusObj.format('D MMM YYYY');
-//   }
-// }
 
 function makeAgeInstance(age: Dayjs, censusDate: census) {
   return {
@@ -48,23 +41,21 @@ function makeAgeInstance(age: Dayjs, censusDate: census) {
   }
 }
 
-function getAges(birthDate: Dayjs, censusData: Array<census>) {
-  const agesArr:Dayjs[] = [];
-  // console.log(birthDate);
-  // console.log(censusData);
-  censusData.length > 0 && censusData.forEach((cen: census) => {
+function getAges(birthDate: Dayjs, censusData: Array<census> | null) {
+  const agesArr: Dayjs[] = [];
+  (censusData && censusData.length > 0) && censusData.forEach((cen: census) => {
     // calcuate age
     console.log(cen);
-    if (cen.censusObj.$y >= birthDate.$y) {
+    if (cen.censusObj.year() >= birthDate.year()) {
       const age = cen.censusObj.diff(birthDate, 'year');
       console.log(age);
       agesArr.push(makeAgeInstance(age, cen));
     }
   });
-  // console.log(agesArr);
   return agesArr;
 }
 
+// create default dates for date picker
 const today = dayjs();
 const minDate = dayjs('1670-01-01 01:00');
 let displayBtn = false;
@@ -77,63 +68,101 @@ function App() {
     show1890Census: false,
     showKansasCensus: true
   });
-  const [resultsView, setResultsView] = useState({
+  const [resultsView, setResultsView] = useState<resultsType>({
     display: false,
     btnText: 'Find Age',
     results: [],
+    btnVariant: 'contained',
     dateWritten: ''
   });
-  const censusList:Array<census | null> = makeCensusList(censusOptions) || [];
+  
+
+  const handleCheckboxChange =(newCensusOptions: options) => {
+    setCensusOptions(newCensusOptions);
+    console.log(censusOptions);
+  };
+
+  const handleUpdateCensusListResults =() => {
+    const censusList: Array<census> = makeCensusList(censusOptions) || [];
+    const ages: Array<ageObj> = birthDate && getAges(birthDate, censusList);
+    const dateWritten: string | null = birthDate && birthDate.format('D MMM YYYY');
+    setResultsView({
+      display: true,
+      btnText: 'Update Age',
+      btnVariant: 'text',
+      results: ages,
+      dateWritten: dateWritten || ''
+    });
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DrawerMenu/>
-        <DatePicker 
-          name='birthDate'
-          value={birthDate}
-          maxDate={today}
-          minDate={minDate}
-          format='DD/MM/YYYY'
-          label='Approx Birth Date'
-          disableFuture
-          views={['day', 'month', 'year']}
-          onYearChange={() => displayBtn = true}
-          onChange={(newValue: Dayjs) => {
-            console.log(newValue);
-            // TODO make this better:
-            if (!Number.isNaN(newValue.$y) && !Number.isNaN(newValue.$D && !Number.isNaN(newValue.$M))) {
-             displayBtn = true;
-            }
-            setBirthDate(newValue);
-          }} 
+      {console.log(censusOptions)}
+      <header>
+        <h1>Age Year Magic</h1>
+        <h2>Age calculator</h2>
+        <p>Narrow down the birthdate of an ancestor<br/>
+          by comparing their ages at census dates.<br/>
+          Enter an approximate birthdate to start</p>
+        <DrawerMenu
+          update={handleUpdateCensusListResults}
+          censusOptions={censusOptions}
+          handleCheckboxChange={handleCheckboxChange}
         />
-      
-      {displayBtn && (
-        <Button 
-          variant="text"
-          onClick={() => {
-            const ages:Array<ageObj | null> = birthDate && getAges(birthDate, censusList);
-            const dateWritten:string | null = birthDate && birthDate.format('D MMM YYYY');
-            console.log(ages);
-            setResultsView({
-              display: true,
-              btnText: 'Update Age',
-              results: ages || [],
-              dateWritten: dateWritten || ''
-            });
-          }}
-        >
-          {resultsView.btnText}
-        </Button>
-      )}
-      {resultsView.display && (
-        <>
-        <p>From a birthdate of {resultsView.dateWritten}</p>
-        <ResultsTable agesData={resultsView.results}/>
-        </>
-      )}
+      </header>
+      <main>
+        <form id="ageEntry">
+          <DatePicker
+            name='birthDate'
+            value={birthDate}
+            maxDate={today}
+            minDate={minDate}
+            format='DD/MM/YYYY'
+            label='Approx Birth Date'
+            disableFuture
+            views={['day', 'month', 'year']}
+            onYearChange={() => displayBtn = true}
+            onChange={(newValue: Dayjs) => {
+              console.log(newValue);
+              // TODO make this better:
+              if (
+                newValue
+                && !Number.isNaN(newValue.year())
+                && !Number.isNaN(newValue.date())
+                && !Number.isNaN(newValue.month())
+              ) {
+                displayBtn = true;
+              }
+              setBirthDate(newValue);
+            }}
+          />
+
+          {displayBtn && (
+            <Button
+              variant={resultsView.btnVariant}
+              onClick={handleUpdateCensusListResults}
+            >
+              {resultsView.btnText}
+            </Button>
+          )}
+        </form>
+        {resultsView.display && (
+          <>
+            <p>From a birthdate of {resultsView.dateWritten}</p>
+            <ResultsTable agesData={resultsView.results} />
+          </>
+        )}
+        <footer>
+          <div className='note'>
+            <p>Remember that ages reported in census records are often approximate.</p>
+            <p>Use this tool to help you find the most likely approximate birthdate.</p>
+          </div>
+
+          <p className='credit'>© Sheyna Watkins</p>
+        </footer>
+      </main>
     </LocalizationProvider>
   )
 }
 
-export default App
+export default App;

@@ -1,15 +1,8 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
-type options = {
-  showUSCensuses: boolean,
-  show1890Census: boolean,
-  showKansasCensus: boolean
-}
-
-type census = {
-  censusObj: Dayjs,
-  censusName: string
-}
+// types:
+import census from './typeCensus';
+import options from './typeOptions';
 
 const usFedCensusArr:string[] = [
   // U.S. Federal Census:
@@ -67,15 +60,11 @@ function makeACensusObj(date: string, censusType: string) {
   const dateObj = dayjs(date);
   return {
     censusObj: dateObj,
-    censusName: `${dateObj.$y} ${censusType}`
+    censusName: `${dateObj.year()} ${censusType}`
   }
 }
 
-// type arr = {
-
-// }
-
-function sortArrOfDayjsInstances(arrToSort: Array<census | null>) {
+function sortArrOfDayjsInstances(arrToSort: Array<census | null | []>) {
   if (arrToSort && arrToSort.length > 1) {
     arrToSort.sort((a,b) => a.censusObj.isAfter(b.censusObj) ? 1 : -1);
     return arrToSort;
@@ -84,20 +73,17 @@ function sortArrOfDayjsInstances(arrToSort: Array<census | null>) {
   }
 }
 
-
-
-
 function makeCensusList(optionsObj: options) {
-  let censusArr = [];
+  let censusArr:Array<census | null | []> = [];
 
   // U.S. Federal Census:
-  optionsObj.showUSCensuses && usFedCensusArr.forEach(date => {
+  optionsObj.showUSCensuses && usFedCensusArr.forEach((date: string) => {
     censusArr.push(makeACensusObj(date, 'U.S. Federal Census'));
   });
 
   // 1890 — June 2, 1890
   optionsObj.show1890Census && censusArr.push(
-    censusArr.push(makeACensusObj('1890-6-2 12:00', 'U.S. Federal Census'))
+    makeACensusObj('1890-6-2 12:00', 'U.S. Federal Census')
   );
 
   // Kansas State Census:
@@ -105,11 +91,11 @@ function makeCensusList(optionsObj: options) {
     censusArr.push(makeACensusObj(date, 'Kansas State Census'));
   });
 
-  // Iowa
+  // TK Iowa
   // 1895 — January 1
 
   // Sort the array by date
-  censusArr = sortArrOfDayjsInstances(censusArr);
+  censusArr = censusArr && sortArrOfDayjsInstances(censusArr);
   return censusArr;
 }
 
