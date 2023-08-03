@@ -10,6 +10,9 @@ import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 // type:
 import options from '../typeOptions';
+import { ConstructionOutlined } from '@mui/icons-material';
+import { useEffect } from 'react'; // Import useEffect
+
 
 function CensusMenu(props: { 
   censusOptions: options; 
@@ -25,13 +28,38 @@ function CensusMenu(props: {
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // censusOptions.show1890Census = false; // need to actually set it like this
+    console.log("in handle change");
+    console.log(event.target.name);
+    console.log(event.target.checked);
+    
+
+    // another way to create a new options object
+    // const newOptions:options = {
+    //   show1890Census: true,
+    //   showKansasCensus: true,
+    //   showUSCensuses: true
+    // }
+    
+    console.log("current censusOptions: ")
+    console.log(censusOptions);
+
     setCensusOptions({
       ...censusOptions,
       [event.target.name]: event.target.checked,
     });
+    
     props.handleCheckboxChange(censusOptions);
+    
+    console.log("it is now:");
+    console.log(censusOptions);
   };
 
+
+  useEffect(() => {
+    props.handleCheckboxChange(censusOptions);
+  }, [censusOptions]);
+  
   return (
     <form onSubmit={props.update}>
       <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
