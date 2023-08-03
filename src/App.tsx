@@ -88,9 +88,8 @@ function App() {
   });
   
   const handleCheckboxChange =(newCensusOptions: options) => {
-    console.log("in app checkbox change")
-    console.log(newCensusOptions);
     setCensusOptions(newCensusOptions);
+    console.log(censusOptions);
   };
 
   const handleUpdateCensusListResults =() => {

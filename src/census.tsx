@@ -82,7 +82,7 @@ function makeCensusList(optionsObj: options) {
 
   // 1890 — June 2, 1890
   optionsObj.show1890Census && censusArr.push(
-    makeACensusObj('1890-6-2 12:00', '1890 U.S. Federal Census')
+    makeACensusObj('1890-6-2 12:00', 'U.S. Federal Census')
   );
 
   // Kansas State Census:
